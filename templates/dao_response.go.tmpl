@@ -1,0 +1,8 @@
+package dao
+
+type {{.Model}}Response struct {
+	ID uint `json:"id"`
+{{- range .Fields }}
+	{{.Name}} {{.Type}} `json:"{{lower .Name}}"`
+{{- end }}
+}

@@ -1,0 +1,12 @@
+package dao
+
+import "time"
+
+type {{.Model}} struct {
+	ID uint `gorm:"primaryKey"`
+{{- range .Fields }}
+	{{.Name}} {{.Type}} `gorm:"column:{{lower .Name}}" json:"{{lower .Name}}"`
+{{- end }}
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}

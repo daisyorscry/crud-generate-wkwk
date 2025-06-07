@@ -1,0 +1,99 @@
+package service
+
+import (
+	"context"
+
+	"daisy/domain/{{.modelVar}}/dao"
+	"daisy/domain/{{.modelVar}}/repository"
+	"daisy/pkg/responses"
+	"github.com/go-playground/validator/v10"
+    "daisy/pkg/pkgErr"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+type {{.Model}}Service interface {
+	Paginate(ctx context.Context, limit, offset int) *responses.BaseResponse
+	GetByID(ctx context.Context, id uint) *responses.BaseResponse
+	Create(ctx context.Context, req *dao.Create{{.Model}}Request) *responses.BaseResponse
+	Update(ctx context.Context, req *dao.Update{{.Model}}Request) *responses.BaseResponse
+	Delete(ctx context.Context, id uint) *responses.BaseResponse
+}
+
+type {{.modelVar}}Service struct {
+	repo      repository.{{.Model}}Repository
+	validator *validator.Validate
+}
+
+func New{{.Model}}Service(repo repository.{{.Model}}Repository,  validator *validator.Validate) {{.Model}}Service {
+	return &{{.modelVar}}Service{repo: repo, validator: validator}
+}
+
+func (s *{{.modelVar}}Service) Paginate(ctx context.Context, limit, offset int) *responses.BaseResponse {
+	items, total, err := s.repo.Paginate(ctx, limit, offset)
+	if err != nil {
+		return responses.ResponseError(fiber.StatusInternalServerError, "Failed to fetch data", err)
+	}
+	return responses.ResponsePagination(fiber.StatusOK, "{{.Model}} list", items, total)
+}
+
+func (s *{{.modelVar}}Service) GetByID(ctx context.Context, id uint) *responses.BaseResponse {
+	item, err := s.repo.FindByID(ctx, id)
+	if err != nil {
+		return responses.ResponseError(fiber.StatusNotFound, "{{.Model}} not found", err)
+	}
+	return responses.ResponseSuccess(fiber.StatusOK, "{{.Model}} detail", item)
+}
+
+func (s *{{.modelVar}}Service) Create(ctx context.Context, req *dao.Create{{.Model}}Request) *responses.BaseResponse {
+	if err := s.validator.StructCtx(ctx, req); err != nil {
+		return responses.ResponseValidation(
+			fiber.ErrUnprocessableEntity.Code,
+			"Validation failed",
+			pkgErr.ParseValidationErrors(err),
+		)
+	}
+
+	data := dao.To{{.Model}}(req)
+
+	if err := s.repo.RunTransaction(ctx, func(txCtx context.Context) error {
+		if err := s.repo.Create(txCtx, data); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return responses.ResponseError(fiber.StatusInternalServerError, "Failed to create {{.Model}}", err)
+	}
+
+	return responses.ResponseSuccess(fiber.StatusCreated, "{{.Model}} created successfully", nil)
+}
+
+func (s *{{.modelVar}}Service) Update(ctx context.Context, req *dao.Update{{.Model}}Request) *responses.BaseResponse {
+	if err := s.validator.StructCtx(ctx, req); err != nil {
+		return responses.ResponseValidation(
+			fiber.ErrUnprocessableEntity.Code,
+			"Validation failed",
+			pkgErr.ParseValidationErrors(err),
+		)
+	}
+
+
+	data := dao.ToUpdated{{.Model}}(req)
+	if err := s.repo.RunTransaction(ctx, func(txCtx context.Context) error {
+		if err := s.repo.Update(txCtx, data); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return responses.ResponseError(fiber.StatusInternalServerError, "Failed to update {{.Model}}", err)
+	}
+
+	return responses.ResponseSuccess(fiber.StatusOK, "{{.Model}} updated successfully", nil)
+}
+
+func (s *{{.modelVar}}Service) Delete(ctx context.Context, id uint) *responses.BaseResponse {
+	if err := s.repo.Delete(ctx, id); err != nil {
+		return responses.ResponseError(fiber.StatusInternalServerError, "Failed to delete {{.Model}}", err)
+	}
+	return responses.ResponseSuccess(fiber.StatusOK, "{{.Model}} deleted successfully", nil)
+}

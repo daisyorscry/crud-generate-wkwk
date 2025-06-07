@@ -1,0 +1,18 @@
+package dao
+
+func To{{.Model}}(req *Create{{.Model}}Request) *{{.Model}} {
+	return &{{.Model}}{
+		{{- range .Fields }}
+		{{ .Name }}: req.{{ .Name }},
+		{{- end }}
+	}
+}
+
+func ToUpdated{{.Model}}(req *Update{{.Model}}Request) *{{.Model}} {
+	return &{{.Model}}{
+		ID: req.ID,
+		{{- range .Fields }}
+		{{ .Name }}: req.{{ .Name }},
+		{{- end }}
+	}
+}

@@ -1,0 +1,14 @@
+package dao
+
+type Create{{.Model}}Request struct {
+{{- range .Fields }}
+	{{.Name}} {{.Type}} {{.Tag}}
+{{- end }}
+}
+
+type Update{{.Model}}Request struct {
+	ID uint `json:"id"`
+{{- range .Fields }}
+	{{.Name}} {{.Type}} {{.Tag}}
+{{- end }}
+}

@@ -1,0 +1,13 @@
+package models
+
+import "time"
+
+type {{.Model}} struct {
+	ID uint `gorm:"primaryKey"`
+{{- range .Fields }}
+	{{ .Name }} {{ .Type }} {{ .Tag }}
+{{- end }}
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt time.Time
+}
