@@ -1,4 +1,3 @@
-
 package generator
 
 import (
@@ -26,13 +25,13 @@ func HandleGenerateModel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for i := range req.Fields {
-		req.Fields[i].Name = strings.Title(req.Fields[i].Name)
+		req.Fields[i].Name = strings.ToTitle(req.Fields[i].Name)
 		req.Fields[i].Type = mapType(req.Fields[i].Type)
 		req.Fields[i].Tag = fmt.Sprintf("`gorm:\"column:%s\" json:\"%s\"`", strings.ToLower(req.Fields[i].Name), strings.ToLower(req.Fields[i].Name))
 	}
 
 	data := map[string]any{
-		"Model":  strings.Title(req.Model),
+		"Model":  strings.ToTitle(req.Model),
 		"Fields": req.Fields,
 	}
 

@@ -1,0 +1,12 @@
+-- +goose Up
+CREATE TABLE IF NOT EXISTS {{.modelVar}}s (
+  id SERIAL PRIMARY KEY,
+  {{- range .Fields }}
+  {{ lower .Name }} {{ sqlType .Type }} NOT NULL,
+  {{- end }}
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- +goose Down
+DROP TABLE IF EXISTS {{.modelVar}}s;

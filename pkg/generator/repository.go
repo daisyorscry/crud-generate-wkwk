@@ -23,7 +23,7 @@ func HandleGenerateRepository(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	model := strings.Title(req.Model)
+	model := strings.ToTitle(req.Model)
 	modelVar := strings.ToLower(req.Model)
 
 	data := map[string]any{

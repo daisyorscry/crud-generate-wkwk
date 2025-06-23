@@ -1,0 +1,7 @@
+// {{.Feature}} routes
+{{.Feature}}Group := api.Group("/{{.Feature}}")
+{{.Feature}}Group.Post("/", d.{{.Model}}Handler.Create)
+{{.Feature}}Group.Put("/:id", d.{{.Model}}Handler.Update)
+{{.Feature}}Group.Get("/:id", d.{{.Model}}Handler.GetByID)
+{{.Feature}}Group.Get("/", d.{{.Model}}Handler.Paginate)
+{{.Feature}}Group.Delete("/:id", d.{{.Model}}Handler.Delete)

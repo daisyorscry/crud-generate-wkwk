@@ -1,27 +1,32 @@
 package routes
 
 import (
-	"daisy/domain/user/handler/rest"
-	"daisy/domain/user/repository"
-	"daisy/domain/user/service"
+	"daisy/domain"
 	"daisy/pkg/database"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
 func Setup(app *fiber.App, conn database.Connection) {
+	d := domain.NewDomain(conn)
 	api := app.Group("/api")
+	// todo routes
+	todoGroup := api.Group("/todo")
+	todoGroup.Post("/", d.TodoHandler.Create)
+	todoGroup.Put("/:id", d.TodoHandler.Update)
+	todoGroup.Get("/:id", d.TodoHandler.GetByID)
+	todoGroup.Get("/", d.TodoHandler.Paginate)
+	todoGroup.Delete("/:id", d.TodoHandler.Delete)
+
+	// user routes
+	apiGroup := api.Group("/user")
+	apiGroup.Post("/", d.UserHandler.Create)
+	apiGroup.Put("/:id", d.UserHandler.Update)
+	apiGroup.Get("/:id", d.UserHandler.GetByID)
+	apiGroup.Get("/", d.UserHandler.Paginate)
+	apiGroup.Delete("/:id", d.UserHandler.Delete)
 
 	api.Get("/health", func(c *fiber.Ctx) error {
 		return c.SendString("OK")
 	})
-
-	userRepo := repository.New(conn)
-	userService := service.New(userRepo, validator.New())
-	userHandler := rest.NewUserHandler(userService)
-
-	auth := api.Group("/auth")
-	auth.Post("/register", userHandler.Register)
-	auth.Post("/login", userHandler.Login)
 }

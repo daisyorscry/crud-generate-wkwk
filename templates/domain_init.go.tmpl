@@ -1,0 +1,4 @@
+{{.modelVar}}Repo := {{.modelVar}}Repo.New(conn)
+{{.modelVar}}Service := {{.modelVar}}Service.New{{.Model}}Service({{.modelVar}}Repo, validator.New())
+{{.modelVar}}Handler := {{.modelVar}}Rest.New{{.Model}}Handler({{.modelVar}}Service)
+d.{{.Model}}Handler = {{.modelVar}}Handler
